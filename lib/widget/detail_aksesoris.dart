@@ -35,9 +35,6 @@ class _Detail_AKState extends State<detail_AK> {
           } else if (snapshot.hasError) {
             return Center(child: Text("Error: ${snapshot.error}"));
           } else {
-            // List<Map<String, dynamic>> data = snapshot.data!.docs
-            //     .map((doc) => doc.data() as Map<String, dynamic>)
-            //     .toList();
             var data = snapshot.data!.data() as Map<String, dynamic>;
             return _buildUI(data);
           }

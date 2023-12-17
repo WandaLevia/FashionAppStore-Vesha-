@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:fashion_app/Cart.dart';
 import 'package:fashion_app/Category.dart';
 import 'package:fashion_app/Login.dart';
-
 import 'package:fashion_app/Profile.dart';
 import 'package:fashion_app/firestore_service.dart';
 import 'package:fashion_app/pages/detail_ak.dart';
@@ -11,7 +11,6 @@ import 'package:fashion_app/pages/detail_pp.dart';
 import 'package:fashion_app/pages/detail_pw.dart';
 import 'package:fashion_app/pages/detail_s.dart';
 import 'package:fashion_app/pages/detail_tas.dart';
-import 'package:flutter/material.dart';
 
 class MainFashionPage extends StatefulWidget {
   const MainFashionPage({Key? key}) : super(key: key);
@@ -44,14 +43,38 @@ class _MainFashionPageState extends State<MainFashionPage> {
         actions: [
           // Tambahkan tombol Logout di dalam AppBar
           IconButton(
-            icon: Icon(Icons.exit_to_app),
+            icon: Icon(Icons.exit_to_app, color: Color(0xFFFCDEC0)),
             onPressed: () async {
-              // Navigasi kembali ke halaman login
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
-                  builder: (context) =>
-                      LoginPage(), // Gantilah LoginPage dengan nama halaman login Anda
+                  builder: (context) => LoginPage(),
                 ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.shopping_cart,
+              color: Color(0xFFFCDEC0), // Set icon color to 0xFFFCDEC0
+            ),
+            onPressed: () {
+              // Navigate to CartPage
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CartPage()),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.person,
+              color: Color(0xFFFCDEC0), // Set icon color to 0xFFFCDEC0
+            ),
+            onPressed: () {
+              // Navigate to ProfilePage
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePage()),
               );
             },
           ),
@@ -64,67 +87,32 @@ class _MainFashionPageState extends State<MainFashionPage> {
             // Hapus widget pencarian (_buildSearchField)
             _buildPageView(),
             _buildCategoryListView(),
+            SizedBox(height: 16.0),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Recommended for You',
+                  style: TextStyle(
+                    color: Color(0xFFFCDEC0),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.0,
+                  ),
+                ),
+              ),
+            ),
+
             _buildProductGridView(),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentPage,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Color(0xFF8A6053),
-        onTap: (index) {
-          setState(() {
-            _currentPage = index;
-            _pageController.animateToPage(
-              _currentPage,
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          });
-          switch (index) {
-            case 0: // Home
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MainFashionPage()),
-              );
-              break;
-              break;
-            case 1: // Cart
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CartPage()),
-              );
-              break;
-            case 2: // Profile
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfilePage()),
-              );
-              break;
-          }
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Cart',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
       ),
     );
   }
 
   Widget _buildPageView() {
-    return Expanded(
+    return Container(
+      height: 200, // Set the desired height for the PageView
       child: StreamBuilder<QuerySnapshot>(
         stream: FirestoreService().getdiscount(),
         builder: (context, snapshot) {
@@ -135,44 +123,42 @@ class _MainFashionPageState extends State<MainFashionPage> {
               return Text(snapshot.error.toString());
             } else {
               List userList = snapshot.data!.docs;
-              itemCount = userList.length > 3 ? 3 : userList.length;
 
-              return SizedBox(
-                width: double.infinity,
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: itemCount,
-                  itemBuilder: (context, index) {
-                    DocumentSnapshot documentSnapshot = userList[index];
-                    Map<String, dynamic> data =
-                        documentSnapshot.data() as Map<String, dynamic>;
-                    String imageUrl = data['Image'];
-                    return Container(
-                      width: MediaQuery.of(context).size.width - 32,
-                      margin: EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 8.0,
+              if (userList.isEmpty) {
+                return Center(child: Text('No data available.'));
+              }
+
+              int itemCount = userList.length > 3 ? 3 : userList.length;
+
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: itemCount,
+                itemBuilder: (context, index) {
+                  DocumentSnapshot documentSnapshot = userList[index];
+                  Map<String, dynamic> data =
+                      documentSnapshot.data() as Map<String, dynamic>;
+                  String imageUrl = data['Image'];
+
+                  return Container(
+                    width: MediaQuery.of(context).size.width - 32,
+                    margin: EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    child: Center(
+                      child: Image.network(
+                        imageUrl,
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(16.0),
-                      ),
-                      child: Center(
-                        child: Image.network(
-                          imageUrl,
-                          width: double.infinity,
-                          height: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    );
-                  },
-                  onPageChanged: (int page) {
-                    setState(() {
-                      _currentPage = page;
-                    });
-                  },
-                ),
+                    ),
+                  );
+                },
               );
             }
           }
@@ -270,7 +256,6 @@ class _MainFashionPageState extends State<MainFashionPage> {
                                   height: 40.0,
                                   child: CircleAvatar(
                                     radius: 25.0,
-                                    // Remove or change the backgroundColor property
                                     child: Image.network(
                                       data['Image'],
                                       width: 28.0,

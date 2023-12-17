@@ -84,8 +84,7 @@ class _DetailPAState extends State<DetailPA> {
                               color: Colors.white38,
                             ),
                             child: Image.network(
-                              category[
-                                  'Image'], // Assuming 'image' is a field in your Firestore document
+                              category['Image'],
                               width: 120,
                               height: 120,
                               fit: BoxFit.cover,

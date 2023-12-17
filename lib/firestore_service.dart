@@ -453,7 +453,7 @@ class FirestoreService {
     return null;
   }
 
-  //cart
+  //categories
   Stream<QuerySnapshot> getcategories() {
     final categoriesStream = categories.snapshots();
     return categoriesStream;
@@ -468,7 +468,7 @@ class FirestoreService {
   }
 
   Future<void> deletecategories(String id) async {
-    discount.doc(id).delete();
+    categories.doc(id).delete();
   }
 
   Future<Map<String, dynamic>?> getcategoriesById(String id) async {

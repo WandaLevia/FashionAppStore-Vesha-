@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class EditProfile extends StatefulWidget {
   final String documentId;
 
-  EditProfile({required this.documentId});
+  const EditProfile({super.key, required this.documentId});
 
   @override
   editProfile createState() => editProfile();
